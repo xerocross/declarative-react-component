@@ -56,25 +56,19 @@ module.exports.DeclarativeReactComponent = function(configObject) {
 
       var methodKeys = Object.keys(configObject.methods);
       for (let i = 0; i < methodKeys.length; i++) {
-
         (function(index) {
           let theMethod = methods[methodKeys[index]];
           limitedSelf[methodKeys[index]] = (function(){
             return theMethod.apply(methodSelf, arguments);
           });
           Object.defineProperty(methodSelf,
-            name,
-            { set: function(val) {throw new Error("cannot change other methods here values")},
+            methodKeys[index],
+            { set: function(val) {throw new Error("cannot change other methods here")},
               get : function() {return limitedSelf[methodKeys[index]]}
             }
           );
-
         })(i);
-
-
-
       }
-
     }
     render() {
       return template.apply(limitedSelf, null);

@@ -31,12 +31,10 @@ export default DeclarativeReactComponent({
       this.someNumber--;
     },
     handleFormChange : function(newValue) {
-      console.log(newValue);
       this.someString = newValue;
     }
   },
   "template" : function() {
-    window.getThis = this;
     return (
       <div>
         <div>
@@ -107,6 +105,11 @@ Each method declared inside `configObject.methods` gets attached directly
 to `this`.  Methods can mutate values from `configObject.data`
 but they may not mutate values from `configObject.props`.
 
+Actually, methods do not have direct access to the entire object. For
+example, it is not possible for one method to overwrite another method.
+Methods have access to read/write data and to read-only props, and they
+can access anything explicitly passed in as an argument.
+
 ### template
 
 The value of `configObject.template` should be a function much like
@@ -114,3 +117,8 @@ the usual `render` function in a React component class.  The primary
 difference is that in our template function `this` refers to a limited
 object that will only allow us to alter elements declared or defined
 in the configObject.
+
+## License
+
+This project and its source code are released under the MIT license.
+For details, see [LICENSE](LICENSE).

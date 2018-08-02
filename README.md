@@ -54,12 +54,6 @@ export default ReactObjectComponent({
 });
 ```
 
-Note that we still write the template using JSX notation, but there
-are some important differences.  All props, state variables, and methods
-exist in the same namespace and are all directly accessible on the
-`self` object.  Props must be declared in the configuration object to
-be accessible on `self`.
-
 The result is a React component we can use in the ordinary way, such
 as this.
 ```
@@ -79,3 +73,40 @@ class DemoApp extends Component {
 }
 export default DemoApp;
 ```
+
+### ReactObjectComponent and configObject
+
+The function `ReactObjectComponent` requires just one argument: the
+configuration object, which henceforth we call `configObject`.
+
+### props
+
+The names of props must be declared in `configObject.props` as an
+array of strings.  If a prop is not declared here, it will not be
+available on the `self` object.
+
+### data
+
+The keys and values declared in `configObject.data` get transformed
+into properties on the React component's `state` object, but this is
+something you do not need to worry about.  It works automagically.  Any
+change made to elements inside `data` will pass through and cause
+re-rendering as they usually do in React.
+
+### methods
+
+Each method declared inside `configObject.methods` must accept `self`
+as its first argument.  Methods can mutate values from `configObject.data`
+but they may not mutate values from `configObject.props`.  In particular,
+we discourage any reference to `this` inside your methods.
+
+### template
+
+The value of `configObject.template` should be a function much like
+the usual `render` function in a React component class.  The primary
+difference is that template must accept `self` as its first argument
+and all references to methods, props, and data should reference `self`.
+
+In particular, we discourage any reference to `this` inside the
+template function.  Everything referenced in the template function
+should be declared or defined in the configObject.

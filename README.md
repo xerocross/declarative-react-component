@@ -1,53 +1,61 @@
-# React Object Component
+# Declarative React Component
 
-A helper for creating simple, declarative React components.  
-It exposes a function `ReactObjectComponent`.  ReactObjectComponent
+A helper for creating React components using a simpler, declarative
+syntax.  The module exposes a function `DeclarativeReactComponent`.  DeclarativeReactComponent
 accepts a config object and returns a reusable component class.
 
 ## Usage
 
-Using ReactObjectComponent, we will still create components in
+Using DeclarativeReactComponent, we will still create components in
 .jsx files.  Consider the following example, which is a complete
 .jsx file for creating a component called ExampleComponent.
 
 ```
 // example-component.jsx
 import React, { Component } from "react";
-import {ReactObjectComponent} from "react-object-component"
+import {DeclarativeReactComponent} from "declarative-react-component"
 
-export default ReactObjectComponent({
+export default DeclarativeReactComponent({
   "props" : [
     "someProp"
   ],
   "data" : {
-    someNumber : 0
+    someNumber : 0,
+    someString : "room"
   },
   "methods" : {
-    up : function(self) {
-      self.someNumber++;
+    up : function() {
+      this.someNumber++;
     },
-    down : function(self) {
-      self.someNumber--;
+    down : function() {
+      this.someNumber--;
+    },
+    handleFormChange : function(newValue) {
+      console.log(newValue);
+      this.someString = newValue;
     }
   },
-  "template" : function(self) {
+  "template" : function() {
+    window.getThis = this;
     return (
       <div>
-          <h2>I'm holding the state value {self.someNumber}
-          and the prop {self.someProp}.
-        </h2>
-        <button
-          type = "button"
-          onClick = {self.up}
-        >
-          Add 1
-        </button>
-        <button
-          type = "button"
-          onClick = {self.down}
-        >
-          Subtract 1
-        </button>
+        <div>
+          <h2>I'm holding the state value {this.someNumber} and the prop {this.someProp}.</h2>
+          <button
+            type = "button"
+            onClick = {this.up}
+          >Add 1</button>
+          <button
+            type = "button"
+            onClick = {this.down}
+          >Subtract 1</button>
+        </div>
+        <div>
+          <h2>I'm also holding the string: {this.someString}</h2>
+          <p>
+            <input type = "text" value = {this.someString} onChange={(e)=>this.handleFormChange(e.target.value)}></input>
+          </p>
+        </div>
       </div>
     );
   }
@@ -74,16 +82,16 @@ class DemoApp extends Component {
 export default DemoApp;
 ```
 
-### ReactObjectComponent and configObject
+### DeclarativeReactComponent and configObject
 
-The function `ReactObjectComponent` requires just one argument: the
+The function `DeclarativeReactComponent` requires just one argument: the
 configuration object, which henceforth we call `configObject`.
 
 ### props
 
 The names of props must be declared in `configObject.props` as an
 array of strings.  If a prop is not declared here, it will not be
-available on the `self` object.
+available on `this`;
 
 ### data
 
@@ -95,18 +103,14 @@ re-rendering as they usually do in React.
 
 ### methods
 
-Each method declared inside `configObject.methods` must accept `self`
-as its first argument.  Methods can mutate values from `configObject.data`
-but they may not mutate values from `configObject.props`.  In particular,
-we discourage any reference to `this` inside your methods.
+Each method declared inside `configObject.methods` gets attached directly
+to `this`.  Methods can mutate values from `configObject.data`
+but they may not mutate values from `configObject.props`.
 
 ### template
 
 The value of `configObject.template` should be a function much like
 the usual `render` function in a React component class.  The primary
-difference is that template must accept `self` as its first argument
-and all references to methods, props, and data should reference `self`.
-
-In particular, we discourage any reference to `this` inside the
-template function.  Everything referenced in the template function
-should be declared or defined in the configObject.
+difference is that in our template function `this` refers to a limited
+object that will only allow us to alter elements declared or defined
+in the configObject.
